@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title> three.js webgl - ShadowMesh </title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        background-color: rgb(0, 0, 0);
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #lightButton {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="container"></div>
+    <input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r76/three.min.js"></script>
+    <script src="CanvasRenderer.js"></script>
+    <script src="Projector.js"></script>
+    <script src="polytopes.js"></script>
+    <script src="main.js"></script>
+
+  </body>
+</html>
