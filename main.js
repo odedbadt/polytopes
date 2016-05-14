@@ -1,5 +1,13 @@
-var shape = icosahedron;
-animate(initLocations(shape), initreneringFunction(), shape, 0);
+
+var state = {
+  shape: trucated_tetrahedron,
+  locations: initLocations(Object.keys(trucated_tetrahedron.graph).length),
+  t: 0,
+}
+initUI()
+var renderingFunction = initRenderingFunction();
+animate();
+
 
 function webglAvailable() {
     try {
@@ -21,12 +29,19 @@ function getRenderer() {
   }
 }
 
-function generation(graph, locations, order) {
-  var lc = locations.map(x=>x.clone());
+function generation(state) {
+  var shape = state.shape;
+  var graph = shape.graph
+  var t = state.t;
+  var locations = state.locations;
+  if (locations.length != Object.keys(graph).length) {
+    locations = initLocations(Object.keys(graph).length);
+  };
+/*  var lc = locations.map(x=>x.clone());
   var F = Math.floor;
   var N = function(n) { return (n + 1) % 2;}
   var C = function(a, b, c) { return a + b * 2 + c * 4;}
-  var K = 1/100;
+  var K = 1/100;*/
   var center = new THREE.Vector3(0, 0, 0);
   for (var i = 0; i < locations.length; ++ i) {
     center.add(locations[i]);
@@ -75,12 +90,16 @@ function generation(graph, locations, order) {
   for (var i = 0; i < locations.length; ++ i) {          
     locations[i].multiplyScalar(1 / avgLength);
   }
-  return locations;
+  return {
+    locations: locations,
+    t: t + 1,
+    shape: shape
+  }
 }
 
-function initLocations(shape) {
+function initLocations(n) {
   var locations = [];
-  for (var i in shape.graph) {
+  for (var i = 0; i < n; ++i) {
     locations[i] = new THREE.Vector3(
         Math.random() - 0.5,
         Math.random() - 0.5,
@@ -101,13 +120,13 @@ function buildGeometry(shape, locations) {
   return geometry;
 }
 
-function initreneringFunction() {
+function initRenderingFunction() {
   var container = document.getElementById( 'container' );
 
   camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
   camera.position.set( 0, - 6, 100 );
 
-  renderer = new THREE.CanvasRenderer();
+  renderer = getRenderer();
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
   container.appendChild( renderer.domElement );
@@ -116,30 +135,50 @@ function initreneringFunction() {
   }
 }
 
-function animate(locations, reneringFunction, shape, n) {
+function animate() {
   
-  render(locations, reneringFunction, shape, n);
-  locations = generation(shape.graph, locations, n);
+  render(state.locations, state.shape, state.t);
+  state = generation(state);
+  state.t = state.t + 1;
   setTimeout(function() {
     requestAnimationFrame(function() {
-      animate(locations, reneringFunction, shape, n + 1)
+      animate()
     });
   }, 0);
 
 }
 
-function render(locations, reneringFunction, shape, n) {
+function render(locations, shape, n) {
 
   var time = Date.now() * 0.0005;
 
   var scene = new THREE.Scene();  
   var geometry = buildGeometry(shape, locations);
   line = new THREE.Line(
-    geometry, new THREE.LineBasicMaterial( { color: 0x00ff00, opacity: 0.5 }))
-  //mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: 0.5 } ) );
-  //scene.add( mesh );
+    geometry, new THREE.LineBasicMaterial( { color: 0x00ff00, opacity: 0.5 }));
   line.rotation.x = time;
   line.rotation.y = time;
   scene.add( line );
-  reneringFunction(scene);  
+  renderingFunction(scene);  
+}
+
+function selectBody(ev) {
+  state.shape = polytopes[ev.target.value];
+  state = generation(state);
+};
+
+function initUI() {
+  var select = document.getElementById('body_select');
+  for (var bodyName in polytopes) {
+    var selectItem = document.createElement('option')    
+    selectItem.setAttribute('value', bodyName);
+    if (polytopes[bodyName] == state.shape) { 
+      selectItem.setAttribute('selected', true);
+    }
+    selectItem.setAttribute('value', bodyName);
+    
+    selectItem.appendChild(document.createTextNode(bodyName))
+    select.appendChild(selectItem);
+  }
+  select.addEventListener('change', selectBody.bind(bodyName));
 }

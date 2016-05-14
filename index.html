@@ -11,7 +11,7 @@
         padding: 0;
         overflow: hidden;
       }
-      #lightButton {
+      #body_select {
         position: absolute;
         right: 20px;
         top: 20px;
@@ -21,8 +21,8 @@
   <body>
 
     <div id="container"></div>
-    <input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()">
-
+    <input id="lightButton" type="button" value="Switch to PointLight" onclick="lightButtonHandler()"/>
+    <select id="body_select"></select>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r76/three.min.js"></script>
     <script src="CanvasRenderer.js"></script>
     <script src="Projector.js"></script>
